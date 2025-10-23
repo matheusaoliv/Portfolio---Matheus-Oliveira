@@ -110,7 +110,26 @@ goto :END
 :PUSH_FAIL
 echo Falha no push. Verifique URL remota, permissoes e autenticacao (HTTPS/SSH).
 
+:: Tentar fallback automatico para HTTPS se a URL for SSH e ainda nao tentamos
+if "%TRIED_HTTPS%"=="1" goto :END
+set "CONTAINS_SSH_1=%REPO_URL:git@github.com=%"
+if not "%CONTAINS_SSH_1%"=="%REPO_URL%" goto :TRY_HTTPS
+set "CONTAINS_SSH_2=%REPO_URL:ssh://=%"
+if not "%CONTAINS_SSH_2%"=="%REPO_URL%" goto :TRY_HTTPS
+
 goto :END
+
+:TRY_HTTPS
+echo Tentando fallback para HTTPS...
+set TRIED_HTTPS=1
+set REPO_URL=https://github.com/%REPO_SLUG%.git
+echo Remote URL (fallback): %REPO_URL%
+Git remote remove origin >nul 2>nul
+Git remote add origin "%REPO_URL%"
+Git push -u origin main
+if errorlevel 1 goto :PUSH_FAIL
+
+goto :SUCCESS
 
 :SUCCESS
 echo(
