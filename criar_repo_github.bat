@@ -25,15 +25,32 @@ if not exist ".git" (
   git init
 )
 
-:: Usa main como branch padrao
+:: Tenta detectar branch atual (pode estar vazio em repos iniciais)
+set "CURBR="
 for /f "tokens=*" %%b in ('git branch --show-current 2^>nul') do set CURBR=%%b
-if not "%CURBR%"=="main" (
-  git branch -M main >nul 2>nul
-)
+if not "%CURBR%"=="" echo Branch atual: %CURBR%
 
+:: Adiciona arquivos e tenta criar commit
 echo Adicionando arquivos e criando commit...
  git add -A
- git commit -m "chore: initial publish" >nul 2>nul
+ git commit -m "chore: initial publish"
+if errorlevel 1 (
+  echo(
+  echo Nao foi possivel criar o commit.
+  echo Possiveis causas:
+  echo  - Identidade Git nao configurada (user.name / user.email)
+  echo  - Nao ha alteracoes para commitar
+  echo(
+  echo Se for identidade, execute:
+  echo   git config --global user.name "Seu Nome"
+  echo   git config --global user.email "seuemail@exemplo.com"
+  echo E depois rode este script novamente.
+  pause
+  goto :END
+)
+
+:: Garantir que a branch principal seja main apos ter um commit
+ git branch -M main >nul 2>nul
 
 :: Verifica GitHub CLI
 set GH_AVAILABLE=0
@@ -94,4 +111,4 @@ pause
 :END
 popd
 endlocal
-
+pause
