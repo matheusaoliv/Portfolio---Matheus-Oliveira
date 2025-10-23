@@ -35,18 +35,21 @@ echo Adicionando arquivos e criando commit...
  git add -A
  git commit -m "chore: initial publish"
 if errorlevel 1 (
-  echo(
-  echo Nao foi possivel criar o commit.
-  echo Possiveis causas:
-  echo  - Identidade Git nao configurada (user.name / user.email)
-  echo  - Nao ha alteracoes para commitar
-  echo(
-  echo Se for identidade, execute:
-  echo   git config --global user.name "Seu Nome"
-  echo   git config --global user.email "seuemail@exemplo.com"
-  echo E depois rode este script novamente.
-  pause
-  goto :END
+  rem Se o commit falhou, verificar se e falta de identidade do Git
+  set "GIT_USER_NAME="
+  for /f "delims=" %%u in ('git config --get user.name 2^>nul') do set GIT_USER_NAME=%%u
+  if "%GIT_USER_NAME%"=="" (
+    echo(
+    echo Commit falhou por falta de identidade do Git.
+    echo Configure e execute novamente:
+    echo   git config --global user.name "Seu Nome"
+    echo   git config --global user.email "seuemail@exemplo.com"
+    pause
+    goto :END
+  ) else (
+    echo(
+    echo Nenhuma alteracao para commitar. Prosseguindo...
+  )
 )
 
 :: Garantir que a branch principal seja main apos ter um commit
