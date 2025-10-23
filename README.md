@@ -60,6 +60,31 @@ Deploy (GitHub Pages)
 - Após o build, os artefatos são publicados e o site fica disponível em:
   - https://matheusaoliv.github.io/Portfolio---Matheus-Oliveira/
 
+Deploy (Vercel)
+- Este projeto também está pronto para deploy na Vercel como site estático (Vite).
+- Arquivo de configuração: `vercel.json` (usa `@vercel/static-build` com `distDir: dist/client` e rotas SPA).
+
+Via CLI (Windows)
+- Pré-requisito: Node.js e npm.
+- Passos:
+  ```cmd
+  D:
+  cd "D:\download\Portfolio - Matheus Oliveira"
+  deploy_vercel.bat
+  ```
+  - O script fará login (`npx vercel login`), link (`npx vercel link`) e deploy de produção (`npx vercel --prod`).
+  - Opcionalmente, ele pode rodar `npm ci && npm run build` local antes do deploy.
+
+Via GitHub (CI da Vercel)
+- No dashboard da Vercel, clique em “Add New…” > “Project”
+- Conecte sua conta do GitHub e selecione o repositório `Portfolio---Matheus-Oliveira`
+- Defina:
+  - Framework Preset: Vite
+  - Build Command: `npm run build`
+  - Output Directory: `dist/client`
+  - Root Directory: (raiz do repositório)
+- Deploys automáticos serão disparados a cada push na `main`.
+
 Estrutura do projeto (resumo)
 ```
 .
@@ -67,6 +92,7 @@ Estrutura do projeto (resumo)
 ├─ package.json
 ├─ vite.config.ts
 ├─ .github/workflows/deploy.yml
+├─ vercel.json
 ├─ src/
 │  ├─ react-app/
 │  │  ├─ App.tsx
@@ -77,7 +103,8 @@ Estrutura do projeto (resumo)
 │  │  └─ pages/Home.tsx
 │  ├─ shared/types.ts
 │  └─ worker/index.ts
-└─ abrir_portfolio.bat
+├─ abrir_portfolio.bat
+└─ deploy_vercel.bat
 ```
 
 Problemas comuns
@@ -89,4 +116,3 @@ Contribuição
 
 Licença
 - Veja o arquivo `LICENSE` na raiz do projeto.
-
