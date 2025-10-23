@@ -110,6 +110,12 @@ goto :END
 :PUSH_FAIL
 echo Falha no push. Verifique URL remota, permissoes e autenticacao (HTTPS/SSH).
 
+:: Tentativa de integrar remoto antes de desistir
+if "%TRIED_PULL%"=="1" goto :AFTER_PULL_ATTEMPT
+set TRIED_PULL=1
+goto :TRY_PULLREBASE
+
+:AFTER_PULL_ATTEMPT
 :: Tentar fallback automatico para HTTPS se a URL for SSH e ainda nao tentamos
 if "%TRIED_HTTPS%"=="1" goto :END
 set "CONTAINS_SSH_1=%REPO_URL:git@github.com=%"
@@ -119,14 +125,26 @@ if not "%CONTAINS_SSH_2%"=="%REPO_URL%" goto :TRY_HTTPS
 
 goto :END
 
+:TRY_PULLREBASE
+echo Tentando integrar alteracoes remotas (pull --rebase)...
+rem Buscar atualizacoes da branch main remota (se existir)
+git fetch origin main >nul 2>nul
+rem Rebase mesmo com historicos nao relacionados (ex.: README criado no remoto)
+git pull --rebase --allow-unrelated-histories origin main
+rem Tentar enviar novamente apos o pull
+git push -u origin main
+if errorlevel 1 goto :PUSH_FAIL
+
+goto :SUCCESS
+
 :TRY_HTTPS
 echo Tentando fallback para HTTPS...
 set TRIED_HTTPS=1
 set REPO_URL=https://github.com/%REPO_SLUG%.git
 echo Remote URL (fallback): %REPO_URL%
-Git remote remove origin >nul 2>nul
-Git remote add origin "%REPO_URL%"
-Git push -u origin main
+git remote remove origin >nul 2>nul
+git remote add origin "%REPO_URL%"
+git push -u origin main
 if errorlevel 1 goto :PUSH_FAIL
 
 goto :SUCCESS
