@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import {
 	Card,
@@ -32,6 +33,7 @@ import {
 	Database,
 	Smartphone,
 	Globe,
+	FileText,
 } from "lucide-react";
 
 // ---------- CONFIG ----------
@@ -661,6 +663,12 @@ export default function PortfolioUX() {
 						<Anchor href="#certificacoes">Qualificações</Anchor>
 						<Anchor href="#projetos">Projetos</Anchor>
 						<Anchor href="#contato">Contato</Anchor>
+						<Link
+							to="/curriculo"
+							className="text-sm md:text-base px-3 py-2 rounded-xl hover:bg-primary/10 transition inline-flex items-center gap-1.5"
+						>
+							<FileText className="size-4" /> Currículo
+						</Link>
 					</div>
 				</div>
 			</nav>
